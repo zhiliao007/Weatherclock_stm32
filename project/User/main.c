@@ -3,7 +3,7 @@
   * 文件名称: main.c 
   * 作    者: 李文晴、乔启鸣
   * 邮    箱: 
-  * 版    本: V2.2.1
+  * 版    本: V2.2.2
   * 编写日期: 2018-05-22
   * 功    能: stm32网络查询天气
   ******************************************************************************
@@ -45,6 +45,7 @@ typedef struct _CityWeather {
 /* 私有变量 ------------------------------------------------------------------*/
 /* 扩展变量 ------------------------------------------------------------------*/
 extern __IO uint8_t ucTcpClosedFlag;
+extern int SwitchToGbk(const unsigned char* pszBufIn, int nBufInLen, unsigned char* pszBufOut, int* pnBufOutLen);
 
 /* 私有函数原形 --------------------------------------------------------------*/
 /* 函数体 --------------------------------------------------------------------*/
@@ -81,7 +82,7 @@ void parsingJSON(const char* str, CityWeather* weather)
 	cJSON* low=cJSON_GetObjectItem(today,"low");
     weather->low_tem = low->valuestring;
 	
-	/* 最低温度 */
+	/* 风力等级 */
 	cJSON* wind_scale=cJSON_GetObjectItem(today,"wind_scale");
     weather->wind_scale = wind_scale->valuestring;
 	
@@ -94,7 +95,7 @@ void parsingJSON(const char* str, CityWeather* weather)
 #if CHINA_WEATHER
 
 #define User_ESP8266_TcpServer_IP                 "wthrcdn.etouch.cn"
-char cStr [80] = {"GET http://wthrcdn.etouch.cn/weather_mini?citykey=101010100\r\n"};
+char cStr [80] = {"GET http://wthrcdn.etouch.cn/weather_mini?citykey=101250201\r\n"};
 char aucOut[400];
 
 void parsingJSON(const char* str, CityWeather* weather)
@@ -105,6 +106,24 @@ void parsingJSON(const char* str, CityWeather* weather)
 	/* 城市 */	
 	cJSON* city=cJSON_GetObjectItem(data,"city");
     weather->city = city->valuestring;
+	
+	/* 日期 */ 
+	cJSON* forecast=cJSON_GetObjectItem(data,"forecast");
+	cJSON* today=cJSON_GetArrayItem(forecast,0);
+	cJSON* date=cJSON_GetObjectItem(today,"date");
+    weather->date = date->valuestring;
+		
+	/* 最高温度 */
+	cJSON* high=cJSON_GetObjectItem(today,"high");
+    weather->high_tem = high->valuestring;
+
+	/* 最低温度 */
+	cJSON* low=cJSON_GetObjectItem(today,"low");
+    weather->low_tem = low->valuestring;
+	
+	/* 风力等级 */
+	cJSON* fengli=cJSON_GetObjectItem(today,"fengli");
+    weather->wind_scale = fengli->valuestring;
 	
 	cJSON_Delete(root);
 }
@@ -154,7 +173,7 @@ int main(void)
 		
 	ESP8266_Init();
 	SYN6288_Play("[v8]系统初始化成功，正在配置ESP8266");
-	printf("姝ｅ湪閰嶇疆 ESP8266 ......\r\n" );
+	printf("\r\n姝ｅ湪閰嶇疆 ESP8266 ......\r\n" );
 
 	if(ESP8266_AT_Test())
 	{
@@ -201,7 +220,22 @@ int main(void)
 		printf("wind_scale = %s\r\n",ctweather.wind_scale);
 		
 		Delay(8000);
-		SYN6288_Play("[v8]今天天气多云转晴");
+		
+		uint8_t GBK_city[20];
+		uint8_t GBK_date[20];
+		uint8_t GBK_high[20];
+		uint8_t GBK_low[20];
+		uint8_t GBK_wind[20];
+		int num;
+		char strl[300];
+		SwitchToGbk((const unsigned char *)ctweather.city, strlen(ctweather.city),GBK_city,&num);
+		SwitchToGbk((const unsigned char *)ctweather.date, strlen(ctweather.date),GBK_date,&num);
+		SwitchToGbk((const unsigned char *)ctweather.high_tem, strlen(ctweather.high_tem),GBK_high,&num);
+		SwitchToGbk((const unsigned char *)ctweather.low_tem, strlen(ctweather.low_tem),GBK_low,&num);
+		SwitchToGbk((const unsigned char *)ctweather.wind_scale, strlen(ctweather.wind_scale),GBK_wind,&num);
+		sprintf(strl,"[v8]%s，%s今天最高温度%s，最低温度%s，风力指数%s",GBK_date,GBK_city,GBK_high,GBK_low,GBK_wind);
+		SYN6288_Play(strl);
+		
 		while(1);
 		
 		#pragma diag_suppress 111
