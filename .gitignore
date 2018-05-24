@@ -64,3 +64,4 @@ mykey.txt
 *.axf
 *.dep
 JLinkLog.txt
+*.dbgconf

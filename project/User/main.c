@@ -43,6 +43,8 @@ typedef struct _CityWeather {
 #define User_ESP8266_TcpServer_Port               "80"                 //要连接的服务器的端口
 
 /* 私有变量 ------------------------------------------------------------------*/
+CityWeather ctweather;
+
 /* 扩展变量 ------------------------------------------------------------------*/
 extern __IO uint8_t ucTcpClosedFlag;
 extern int SwitchToGbk(const unsigned char* pszBufIn, int nBufInLen, unsigned char* pszBufOut, int* pnBufOutLen);
@@ -149,30 +151,8 @@ void parsingJSON(const char* str, CityWeather* weather)
 
 #endif
 
-/**
-  * 函数功能: 主函数.
-  * 输入参数: 无
-  * 返 回 值: 无
-  * 说    明: 无
-  */
-int main(void)
-{ 
-	uint8_t ucStatus;  
-	CityWeather ctweather;
-	
-	/* 调试串口初始化配置，115200-N-8-1.使能串口发送和接受 */
-	DEBUG_USART_Init();  
-	
-	FSMC_SRAM_Init();			//初始化外部SRAM  
-	my_mem_init(SRAMIN);		//初始化内部内存池
-	my_mem_init(SRAMEX);		//初始化外部内存池
-	
-	SysTick_Init();
-
-	SYN6288_Init();
-		
-	ESP8266_Init();
-	SYN6288_Play("[v8]系统初始化成功，正在配置ESP8266");
+void setESP8266Mode(void)
+{
 	printf("\r\n姝ｅ湪閰嶇疆 ESP8266 ......\r\n" );
 
 	if(ESP8266_AT_Test())
@@ -192,9 +172,58 @@ int main(void)
 	printf("\r\n< 4 >\r\n");
 	while(!ESP8266_UnvarnishSend());	
 	printf("閰嶇疆 ESP8266 瀹屾瘯\r\n");
+}
 
+void dataToGBK(CityWeather *weather,char * buff)
+{
+	uint8_t GBK_city[20];
+	uint8_t GBK_date[20];
+	uint8_t GBK_high[20];
+	uint8_t GBK_low[20];
+	uint8_t GBK_wind[20];
+	int num;
+
+	SwitchToGbk((const unsigned char *)weather->city, strlen(weather->city),GBK_city,&num);
+	SwitchToGbk((const unsigned char *)weather->date, strlen(weather->date),GBK_date,&num);
+	SwitchToGbk((const unsigned char *)weather->high_tem, strlen(weather->high_tem),GBK_high,&num);
+	SwitchToGbk((const unsigned char *)weather->low_tem, strlen(weather->low_tem),GBK_low,&num);
+	SwitchToGbk((const unsigned char *)weather->wind_scale, strlen(weather->wind_scale),GBK_wind,&num);
+	sprintf(buff,"[v8]%s，%s今天最高温度%s，最低温度%s，风力指数%s",GBK_date,GBK_city,GBK_high,GBK_low,GBK_wind);
+
+}
+/**
+  * 函数功能: 主函数.
+  * 输入参数: 无
+  * 返 回 值: 无
+  * 说    明: 无
+  */
+int main(void)
+{ 
+	uint8_t ucStatus;  
+	char buff[300];
+	
+	/* 初始化调试串口，115200-N-8-1. */
+	DEBUG_USART_Init();  
+	
+	/* 初始化内存管理 */
+	FSMC_SRAM_Init();
+	my_mem_init(SRAMIN);
+	my_mem_init(SRAMEX);
+	
+	/* 初始化系统滴答定时器 */
+	SysTick_Init();
+
+	/* 初始化SYN6288语音播报模块 */
+	SYN6288_Init();
+		
+	/* 初始化ESP8266网络模块 */
+	ESP8266_Init();
+	
+	/* 配置ESP8266入网 */
+	SYN6288_Play("[v8]系统初始化成功，正在配置ESP8266");
+	setESP8266Mode();
 	SYN6288_Play("[v8]ESP8266配置成功，正在查询天气");
-	/* 无限循环 */
+	
 	while (1)
 	{
 		/* 发送GET请求 */
@@ -218,26 +247,18 @@ int main(void)
 		printf("high_tem = %s\r\n",ctweather.high_tem);
 		printf("low_tem = %s\r\n",ctweather.low_tem);
 		printf("wind_scale = %s\r\n",ctweather.wind_scale);
-		
 		Delay(8000);
 		
-		uint8_t GBK_city[20];
-		uint8_t GBK_date[20];
-		uint8_t GBK_high[20];
-		uint8_t GBK_low[20];
-		uint8_t GBK_wind[20];
-		int num;
-		char strl[300];
-		SwitchToGbk((const unsigned char *)ctweather.city, strlen(ctweather.city),GBK_city,&num);
-		SwitchToGbk((const unsigned char *)ctweather.date, strlen(ctweather.date),GBK_date,&num);
-		SwitchToGbk((const unsigned char *)ctweather.high_tem, strlen(ctweather.high_tem),GBK_high,&num);
-		SwitchToGbk((const unsigned char *)ctweather.low_tem, strlen(ctweather.low_tem),GBK_low,&num);
-		SwitchToGbk((const unsigned char *)ctweather.wind_scale, strlen(ctweather.wind_scale),GBK_wind,&num);
-		sprintf(strl,"[v8]%s，%s今天最高温度%s，最低温度%s，风力指数%s",GBK_date,GBK_city,GBK_high,GBK_low,GBK_wind);
-		SYN6288_Play(strl);
+		/* 将天气数据编码转为GBK */
+		dataToGBK(&ctweather,buff);
 		
+		/* 播放天气 */
+		SYN6288_Play(buff);
+		
+		Delay(50000);
 		while(1);
 		
+		/* 断线重连 */
 		#pragma diag_suppress 111
 		if(ucTcpClosedFlag)                                             //检测是否失去连接
 		{
