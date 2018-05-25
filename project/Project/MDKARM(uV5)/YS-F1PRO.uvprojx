@@ -575,6 +575,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\User\bsp\syn6288\bsp_syn6288x.c</FilePath>
             </File>
+            <File>
+              <FileName>bsp_spi_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\bsp\spi_flash\bsp_spi_flash.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

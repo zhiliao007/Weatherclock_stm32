@@ -15,6 +15,7 @@
 #include "bsp/systick/bsp_SysTick.h"
 #include "bsp/ESP8266/bsp_esp8266.h"
 #include "bsp/syn6288/bsp_syn6288.h"
+#include "bsp/spi_flash/bsp_spi_flash.h"
 #include "bsp/sram/bsp_sram.h"	
 #include "bsp/malloc/bsp_malloc.h"	 
 
@@ -187,8 +188,13 @@ void dataToGBK(CityWeather *weather,char * buff)
 	SwitchToGbk((const unsigned char *)weather->date, strlen(weather->date),GBK_date,&num);
 	SwitchToGbk((const unsigned char *)weather->high_tem, strlen(weather->high_tem),GBK_high,&num);
 	SwitchToGbk((const unsigned char *)weather->low_tem, strlen(weather->low_tem),GBK_low,&num);
-	SwitchToGbk((const unsigned char *)weather->wind_scale, strlen(weather->wind_scale),GBK_wind,&num);
-	sprintf(buff,"[v8]%s，%s今天最高温度%s，最低温度%s，风力指数%s",GBK_date,GBK_city,GBK_high,GBK_low,GBK_wind);
+	GBK_high[7] = '\0';
+	GBK_low[7] = '\0';
+	GBK_wind[0] = (weather->wind_scale)[9];
+	GBK_wind[1] = (weather->wind_scale)[10];
+	GBK_wind[2] = (weather->wind_scale)[11];
+	GBK_wind[3] = '\0';
+	sprintf(buff,"[v8]5月%s，%s今天%s度，%s度，风力指数%s级",GBK_date,GBK_city,GBK_high,GBK_low,GBK_wind);
 
 }
 /**
@@ -224,7 +230,7 @@ int main(void)
 	setESP8266Mode();
 	SYN6288_Play("[v8]ESP8266配置成功，正在查询天气");
 	
-	while (1)
+	while(1)
 	{
 		/* 发送GET请求 */
 		while (!ESP8266_SendString(ENABLE,cStr,131,Single_ID_0)); 
@@ -255,7 +261,7 @@ int main(void)
 		/* 播放天气 */
 		SYN6288_Play(buff);
 		
-		Delay(50000);
+		Delay(10000);
 		while(1);
 		
 		/* 断线重连 */
