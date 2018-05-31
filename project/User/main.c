@@ -19,6 +19,7 @@
 #include "bsp/stmflash/stm_flash.h"
 #include "bsp/sram/bsp_sram.h"	
 #include "bsp/malloc/bsp_malloc.h"	 
+#include "config.h"
 
 #include <string.h>
 #include "cjson/cJSON.h"
@@ -34,19 +35,6 @@ typedef struct _CityWeather {
 }CityWeather;
 
 /* 私有宏定义 ----------------------------------------------------------------*/
-#define XINZHI_WEATHER                           0               //心知天气
-#define JISU_WEATHER                             0               //极速数据
-#define CHINA_WEATHER                            1               //中国天气
-
-
-#define User_ESP8266_ApSsid                      "Xiaomi_LAB"    //要连接的热点的名称
-#define User_ESP8266_ApPwd                       "lab141516"     //要连接的热点的密钥
-
-#define FLASH_ssidAddress                        0x807F000       // 用来保存wifi的ssid
-#define FLASH_pwdAddress                         0x807F700       // 用来保存wifi的pwd
-#define FLASH_flagAddress                        0x807FF00       // FLASH使用标志
-
-#define User_ESP8266_TcpServer_Port              "80"            //要连接的服务器的端口
 
 /* 私有变量 ------------------------------------------------------------------*/
 CityWeather ctweather;
@@ -201,7 +189,7 @@ void dataToGBK(CityWeather *weather,char * buff)
 	GBK_wind[1] = (weather->wind_scale)[10];
 	GBK_wind[2] = (weather->wind_scale)[11];
 	GBK_wind[3] = '\0';
-	sprintf(buff,"[v8]5月%s，%s今天%s度，%s度，风力指数%s级",GBK_date,GBK_city,GBK_high,GBK_low,GBK_wind);
+	sprintf(buff,"5月%s，%s今天%s度，%s度，风力指数%s级",GBK_date,GBK_city,GBK_high,GBK_low,GBK_wind);
 
 }
 
@@ -243,20 +231,22 @@ int main(void)
 	ESP8266_Init();
 	
 
-	SYN6288_Play("[v8]系统初始化成功，正在配置ESP8266");
+	SYN6288_Play("[d][o0][v10][t5]");
+	Delay(200);
+	SYN6288_Play("系统初始化成功，正在配置ESP8266");
 	Delay(8000);
 	/* 从FLASH中读取密码 */
 	STMFLASH_Read(FLASH_flagAddress,&flashFlag,1);
 	if(flashFlag == 0xDDDD)
 	{
-		SYN6288_Play("[v8]正在读取保存的歪滥账号密码");
+		SYN6288_Play("正在读取保存的歪滥账号密码");
 		/* 读取WIFI账号密码 */
 		STMFLASH_Read(FLASH_ssidAddress,(uint16_t *)ssidBuff,25);
 		STMFLASH_Read(FLASH_pwdAddress,(uint16_t *)pwdBuff,25);
 	}
 	else
 	{
-		SYN6288_Play("[v8]初次使用正在设置账号密码");
+		SYN6288_Play("初次使用正在设置账号密码");
 		/* 向内部Flash写入初始密码 */
 		STMFLASH_Write(FLASH_ssidAddress,(uint16_t *)g_ssid,strlen(g_ssid)/2);
 		STMFLASH_Write(FLASH_pwdAddress,(uint16_t *)g_pwd,strlen(g_pwd)/2);
@@ -268,7 +258,7 @@ int main(void)
 	/* 配置ESP8266入网 */
 	setESP8266Mode((char *)ssidBuff,(char *)pwdBuff);
 	
-	SYN6288_Play("[v8]ESP8266配置成功，正在查询天气");
+	SYN6288_Play("ESP8266配置成功，正在查询天气");
 	
 	while(1)
 	{
