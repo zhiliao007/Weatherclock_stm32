@@ -147,7 +147,7 @@ void parsingJSON(const char* str, CityWeather* weather)
 
 #endif
 
-void setESP8266Mode(char *ssid, char *pwd)
+void setESP8266STAMode(char *ssid, char *pwd)
 {
 	printf("\r\n姝ｅ湪閰嶇疆 ESP8266 ......\r\n" );
 
@@ -167,6 +167,31 @@ void setESP8266Mode(char *ssid, char *pwd)
 	while(!ESP8266_Link_Server(enumTCP,User_ESP8266_TcpServer_IP,User_ESP8266_TcpServer_Port,Single_ID_0));	
 	printf("\r\n< 4 >\r\n");
 	while(!ESP8266_UnvarnishSend());	
+	printf("閰嶇疆 ESP8266 瀹屾瘯\r\n");
+}
+
+void setESP8266APMode(void)
+{
+	char espSSID[] = {"esp8266"};
+	char espPWD[] = {"esp82666"};
+	char espPN[] = {"1234"};
+	char espTO[] = {"1000"};
+	printf("\r\n姝ｅ湪閰嶇疆 ESP8266 ......\r\n" );
+
+	if(ESP8266_AT_Test())
+	{
+		printf("AT test OK\r\n");
+	}
+	printf("\r\n< 1 >\r\n");
+	if(ESP8266_Net_Mode_Choose(AP))
+	{
+		printf("ESP8266_Net_Mode_Choose OK\r\n");
+	}  
+	printf("\r\n< 2 >\r\n");
+	while(!ESP8266_BuildAP(espSSID,espPWD,WPA_WPA2_PSK));		
+	printf("\r\n< 3 >\r\n");
+	ESP8266_Enable_MultipleId(ENABLE);	
+	while(!ESP8266_StartOrShutServer(ENABLE,espPN,espTO));	
 	printf("閰嶇疆 ESP8266 瀹屾瘯\r\n");
 }
 
@@ -255,9 +280,16 @@ int main(void)
 		STMFLASH_Read(FLASH_ssidAddress,(uint16_t *)ssidBuff,25);
 		STMFLASH_Read(FLASH_pwdAddress,(uint16_t *)pwdBuff,25);
 	}
+#define ESP8266APEN 0
+#if ESP8266APEN
+	setESP8266APMode(void);
+	SYN6288_Play("配置AP模式成功");
+	while(1){
+		printf("%s",ESP8266_ReceiveString(ENABLE));
+	}
+#endif
 	/* 配置ESP8266入网 */
-	setESP8266Mode((char *)ssidBuff,(char *)pwdBuff);
-	
+	setESP8266STAMode((char *)ssidBuff,(char *)pwdBuff);
 	SYN6288_Play("ESP8266配置成功，正在查询天气");
 	
 	while(1)
