@@ -3,7 +3,7 @@
   * 文件名称: main.c 
   * 作    者: 李文晴、乔启鸣
   * 邮    箱: 
-  * 版    本: V2.3.0
+  * 版    本: V2.3.1
   * 编写日期: 2018-05-22
   * 功    能: stm32网络查询天气
   ******************************************************************************
@@ -219,8 +219,8 @@ void dataToGBK(CityWeather *weather,char * buff)
 }
 
 
-
-uint16_t g_flashFlag = 0xDDDD;
+#define FLASHFLAG 0xCCCC
+uint16_t g_flashFlag = FLASHFLAG;
 
 /**
   * 函数功能: 主函数.
@@ -262,7 +262,7 @@ int main(void)
 	Delay(8000);
 	/* 从FLASH中读取密码 */
 	STMFLASH_Read(FLASH_flagAddress,&flashFlag,1);
-	if(flashFlag == 0xDDDD)
+	if(flashFlag == FLASHFLAG)
 	{
 		SYN6288_Play("正在读取保存的歪滥账号密码");
 		/* 读取WIFI账号密码 */
@@ -272,22 +272,27 @@ int main(void)
 	else
 	{
 		SYN6288_Play("初次使用正在设置账号密码");
+		setESP8266APMode();
+		SYN6288_Play("配置AP模式成功,请连接到esp8266并输入账号密码");
+		ESP8266_ReceiveString(ENABLE);
+		SYN6288_Play("连接成功");
+		sprintf((char *)ssidBuff,"%s",ESP8266_ReceiveString(ENABLE));
+		SYN6288_Play("账号为");
+		Delay(3000);
+		SYN6288_Play((const char *)(ssidBuff+12));         //12 and 11 is offest address 
+		sprintf((char *)pwdBuff,"%s",ESP8266_ReceiveString(ENABLE));
+		SYN6288_Play("密码为");
+		Delay(3000);
+		SYN6288_Play((const char *)(pwdBuff+11));
+		Delay(5000);
 		/* 向内部Flash写入初始密码 */
-		STMFLASH_Write(FLASH_ssidAddress,(uint16_t *)g_ssid,strlen(g_ssid)/2);
-		STMFLASH_Write(FLASH_pwdAddress,(uint16_t *)g_pwd,strlen(g_pwd)/2);
+		STMFLASH_Write(FLASH_ssidAddress,(uint16_t *)(ssidBuff+12),(strlen((const char *)ssidBuff)-12)/2+1);
+		STMFLASH_Write(FLASH_pwdAddress,(uint16_t *)(pwdBuff+11),(strlen((const char *)pwdBuff)-11)/2+1);
 		STMFLASH_Write(FLASH_flagAddress,&g_flashFlag,1);
-		/* 读取WIFI账号密码 */
-		STMFLASH_Read(FLASH_ssidAddress,(uint16_t *)ssidBuff,25);
-		STMFLASH_Read(FLASH_pwdAddress,(uint16_t *)pwdBuff,25);
+		SYN6288_Play("配置完成，请复位重启系统");
+		while(1);
 	}
-#define ESP8266APEN 0
-#if ESP8266APEN
-	setESP8266APMode(void);
-	SYN6288_Play("配置AP模式成功");
-	while(1){
-		printf("%s",ESP8266_ReceiveString(ENABLE));
-	}
-#endif
+
 	/* 配置ESP8266入网 */
 	setESP8266STAMode((char *)ssidBuff,(char *)pwdBuff);
 	SYN6288_Play("ESP8266配置成功，正在查询天气");
