@@ -2,9 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QUdpSocket>
 #include <QTcpSocket>
 #include <QTcpServer>
-#include <QLabel>
+//#include <QLabel>
 
 namespace Ui {
 class MainWindow;
@@ -18,6 +19,10 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    void initList();
+    void addIpItem(QByteArray data);
+    void BroadcastGetIpCommand();
+    void initBroadcast();
 private:
     Ui::MainWindow *ui;
     QTcpSocket *tcpSocket;
@@ -25,11 +30,14 @@ private:
     // 用来存放数据的大小信息
     quint16 blockSize;
      //QTcpServer *tcpServer;
+    QUdpSocket * receiver;
+    QUdpSocket * sender;
 private slots:
     void newConnect();//新连接
     void readMessage();//读取数据
     void displayError(QAbstractSocket::SocketError);
-   void sendMessage();//发送数据
+    void sendMessage();//发送数据
+    void processPengingDatagram();
 };
 
 #endif // MAINWINDOW_H

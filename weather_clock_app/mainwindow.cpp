@@ -1,7 +1,12 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QtNetwork>
-#include <QLabel>
+
+//#define GET_HOST_COMMAND "GetCYHost"
+#define GET_HOST_COMMAND "GetIPAddr"
+#define LOCAL_PORT 11121
+#define DEST_PORT 12811
+#define TRY_TIMES 1
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -16,6 +21,8 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(displayError(QAbstractSocket::SocketError)));
     connect(ui->pushButton_login,SIGNAL(clicked()),this,SLOT(newConnect())); //新建一个连接
 
+    initList();
+    initBroadcast();
 }
 
 MainWindow::~MainWindow()
@@ -74,4 +81,64 @@ void MainWindow::sendMessage()
     // 发送数据成功后，显示提示
    tcpSocket->write(username.toLatin1());
    qDebug()<<"发送成功"<<endl;
+}
+
+void MainWindow::initBroadcast()
+{
+    receiver = new QUdpSocket(this);
+    /////绑定，第一个参数为端口号，第二儿表示允许其它地址链接该广播
+    receiver->bind(LOCAL_PORT,QUdpSocket::ShareAddress);
+
+    //readyRead:每当有数据报来时发送这个信号
+    connect(receiver,SIGNAL(readyRead()),this,SLOT(processPengingDatagram()));
+
+    BroadcastGetIpCommand();
+}
+
+void MainWindow::BroadcastGetIpCommand()
+{
+    //QByteArray datagram = "Hello World!";
+    QByteArray datagram = GET_HOST_COMMAND;
+    int times = TRY_TIMES;
+    while(times--)
+    {
+        //sender->writeDatagram(datagram.data(),datagram.size(),QHostAddress::Broadcast,1066);
+        receiver->writeDatagram(datagram.data(),datagram.size(),QHostAddress::Broadcast,DEST_PORT);
+    }
+}
+
+void MainWindow::initList()
+{
+    ui->label_test->setFixedWidth(70);
+    ui->label_test->setText("广播IP地址：");
+
+    QListWidgetItem* lst1 = new QListWidgetItem("ip list:", ui->listWidget);
+
+    ui->listWidget->insertItem(1, lst1);
+
+    //ui->listWidget->show();
+
+    //setCentralWidget(ui->listWidget);
+}
+
+void MainWindow::processPengingDatagram()
+{
+    //数据报不为空
+    while( receiver->hasPendingDatagrams() )
+    {
+        QByteArray datagram;
+        //datagram大小为等待处理数据报的大小才能就收数据;
+        datagram.resize( receiver->pendingDatagramSize() );
+        //接收数据报
+        receiver->readDatagram(datagram.data(),datagram.size());
+        //ui->label_test->setText(datagram);
+        addIpItem(datagram);
+    }
+}
+
+void MainWindow::addIpItem(QByteArray data)
+{
+
+    QListWidgetItem* lst1 = new QListWidgetItem(data, ui->listWidget);
+    ui->listWidget->insertItem(1, lst1);
 }
