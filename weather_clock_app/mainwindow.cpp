@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QtNetwork>
+#
 
 //#define GET_HOST_COMMAND "GetCYHost"
 #define GET_HOST_COMMAND "GetIPAddr"
@@ -23,11 +24,30 @@ MainWindow::MainWindow(QWidget *parent) :
 
     initList();
     initBroadcast();
+    qDebug()<<getLocalHostIP()<<endl;
+    qDebug()<<"=============！"<<endl;
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+QString MainWindow::getLocalHostIP()
+{
+    QList<QHostAddress> list = QNetworkInterface::allAddresses();
+        foreach (QHostAddress address, list)
+        {
+           if(address.protocol() == QAbstractSocket::IPv4Protocol) //我们使用IPv4地址
+           {
+               if(address.toString().contains( "192.168."))
+               {
+                   qDebug()<<address.toString();
+                   return address.toString();
+               }
+           }
+        }
+           return 0;
 }
 
 void MainWindow::newConnect()
@@ -37,8 +57,9 @@ void MainWindow::newConnect()
     blockSize = 0;
     // 取消已有的连接
     tcpSocket->abort();//终止当前的连接
-    tcpSocket->connectToHost(ui->lineEdit_ip->text(),
-                             ui->lineEdit_duankou->text().toInt());//与服务器连接，在对话框中输入ip和端口号
+/*  tcpSocket->connectToHost(ui->lineEdit_ip->text(),
+                             ui->lineEdit_duankou->text().toInt());//与服务器连接，在对话框中输入ip和端口号 */
+ //   tcpSocket->connectToHost(,1234);
  if(tcpSocket->waitForConnected(1000))
     {
        qDebug()<<"连接成功！"<<endl;

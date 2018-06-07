@@ -33,6 +33,7 @@ private:
     QUdpSocket * receiver;
     QUdpSocket * sender;
 private slots:
+    QString getLocalHostIP();//查询本机IP
     void newConnect();//新连接
     void readMessage();//读取数据
     void displayError(QAbstractSocket::SocketError);
