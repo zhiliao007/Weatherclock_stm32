@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     initList();
     initBroadcast();
-    qDebug()<<getLocalHostIP()<<endl;
+
     qDebug()<<"=============！"<<endl;
 }
 
@@ -42,7 +42,9 @@ QString MainWindow::getLocalHostIP()
            {
                if(address.toString().contains( "192.168."))
                {
+                   this->ui->lineEdit_localIP->setText(address.toString());
                    qDebug()<<address.toString();
+
                    return address.toString();
                }
            }
@@ -57,16 +59,32 @@ void MainWindow::newConnect()
     blockSize = 0;
     // 取消已有的连接
     tcpSocket->abort();//终止当前的连接
+    QString str = getLocalHostIP().section('.',0,2);
+    for(int i = 2; i < 255; i++)
+    {
+        QString num;
+        tcpSocket->connectToHost(str + "." +num.number(i),1234);
+         qDebug()<<str+"."+num.number(i)<<endl;
+        if(tcpSocket->waitForConnected(200))
+           {
+              qDebug()<<"连接成功！"<<endl;
+              ui->messageLabel->setText("成功！");
+              ui->lineEdit_ip->setText(str + "." +num.number(i));
+              return;
+          }
+    }
+    ui->messageLabel->setText("超时");
+
 /*  tcpSocket->connectToHost(ui->lineEdit_ip->text(),
-                             ui->lineEdit_duankou->text().toInt());//与服务器连接，在对话框中输入ip和端口号 */
- //   tcpSocket->connectToHost(,1234);
+                             ui->lineEdit_duankou->text().toInt());//与服务器连接，在对话框中输入ip和端口号
+
  if(tcpSocket->waitForConnected(1000))
     {
        qDebug()<<"连接成功！"<<endl;
        ui->messageLabel->setText("成功！");
    }
  else
-     ui->messageLabel->setText("超时");
+     ui->messageLabel->setText("超时");*/
 }
 
 void MainWindow::readMessage()
