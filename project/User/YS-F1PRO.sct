@@ -11,8 +11,8 @@ LR_IROM1 0x08000000 0x00080000  {    ; load region size_region
   RW_IRAM1 0x20000000 0x00010000  {  ; RW data
    .ANY (+RW +ZI)
   }
-  RW_ERAM1 0x68000000 0x100000 {  	; 外部SRAM
-   .ANY (+RW +ZI)
-  }
+  RW_ERAM1 0x680FF000 0xFFF {  	; 外部SRAM
+	.ANY (+RW +ZI)
+ }
 }
 
