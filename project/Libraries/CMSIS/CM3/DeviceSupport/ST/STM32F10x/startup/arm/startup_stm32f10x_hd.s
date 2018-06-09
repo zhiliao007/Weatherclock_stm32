@@ -42,7 +42,7 @@ __initial_sp
 ;   <o>  Heap Size (in Bytes) <0x0-0xFFFFFFFF:8>
 ; </h>
 
-Heap_Size       EQU     0x00000D000
+Heap_Size       EQU     0x00000F000
 
                 AREA    HEAP, NOINIT, READWRITE, ALIGN=3
 __heap_base
@@ -147,9 +147,14 @@ __Vectors_Size  EQU  __Vectors_End - __Vectors
 Reset_Handler   PROC
                 EXPORT  Reset_Handler             [WEAK]
                 IMPORT  __main
-                IMPORT  SystemInit
+                IMPORT  SystemInit						
+				;从外部文件引入声明
+				IMPORT FSMC_SRAM_Init
                 LDR     R0, =SystemInit
-                BLX     R0               
+                BLX     R0           
+				;在__main之前调用SDRAM_Init进行初始化
+				LDR   R0, = FSMC_SRAM_Init
+				BLX   R0        
                 LDR     R0, =__main
                 BX      R0
                 ENDP

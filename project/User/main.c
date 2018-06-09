@@ -15,6 +15,7 @@
 #include "bsp/systick/bsp_SysTick.h"
 #include "bsp/ESP8266/bsp_esp8266.h"
 #include "bsp/syn6288/bsp_syn6288.h"
+#include "bsp/rtc/bsp_rtc.h"
 #include "bsp/spi_flash/bsp_spi_flash.h"
 #include "bsp/stmflash/stm_flash.h"
 #include "bsp/sram/bsp_sram.h"	
@@ -37,6 +38,8 @@ typedef struct _CityWeather {
 /* 私有宏定义 ----------------------------------------------------------------*/
 
 /* 私有变量 ------------------------------------------------------------------*/
+struct rtc_time systmtime;
+__IO uint8_t TimeDisplay;
 CityWeather ctweather;
 const char g_ssid[]={User_ESP8266_ApSsid};
 const char g_pwd[]={User_ESP8266_ApPwd};
@@ -229,7 +232,7 @@ uint16_t g_flashFlag = FLASHFLAG;
   * 说    明: 无
   */
 int main(void)
-{ 
+{
 	uint8_t ucStatus;  
 	char buff[300];
 	uint16_t flashFlag;
@@ -242,13 +245,14 @@ int main(void)
 	/* 初始化系统滴答定时器 */
 	SysTick_Init();
 
-
-
 	/* 初始化内存管理 */
-	FSMC_SRAM_Init();
+	//FSMC_SRAM_Init();
 	my_mem_init(SRAMIN);
 	my_mem_init(SRAMEX);
-
+	
+	/* 初始化RTC */
+	RTC_CheckAndConfig(&systmtime);
+	
 	/* 初始化SYN6288语音播报模块 */
 	SYN6288_Init();
 		
@@ -297,40 +301,39 @@ int main(void)
 	setESP8266STAMode((char *)ssidBuff,(char *)pwdBuff);
 	SYN6288_Play("ESP8266配置成功，正在查询天气");
 	
+
+	/* 发送GET请求 */
+	while (!ESP8266_SendString(ENABLE,cStr,131,Single_ID_0)); 
+	/* 获取天气数据包 */
+	char *httpData = ESP8266_ReceiveString(ENABLE);
+	
+	
+#if CHINA_WEATHER	  		
+	/* gzip解压原始数据 */
+	unzipmem(httpData, strEsp8266_Fram_Record .InfBit .FramLength, aucOut); 
+	/* 解包JSON数据获取天气数据 */
+	parsingJSON((const char*)aucOut, &ctweather);
+#else
+	/* 解包JSON数据获取天气数据 */
+	parsingJSON((const char*)httpData, &ctweather);
+#endif
+	
+	printf("city = %s\r\n",ctweather.city);
+	printf("date = %s\r\n",ctweather.date);
+	printf("high_tem = %s\r\n",ctweather.high_tem);
+	printf("low_tem = %s\r\n",ctweather.low_tem);
+	printf("wind_scale = %s\r\n",ctweather.wind_scale);
+	Delay(8000);
+	
+	/* 将天气数据编码转为GBK */
+	dataToGBK(&ctweather,buff);
+	
+	/* 播放天气 */
+	SYN6288_Play(buff);
+	
+	//Delay(10000);
 	while(1)
-	{
-		/* 发送GET请求 */
-		while (!ESP8266_SendString(ENABLE,cStr,131,Single_ID_0)); 
-		/* 获取天气数据包 */
-		char *httpData = ESP8266_ReceiveString(ENABLE);
-		
-		
-	#if CHINA_WEATHER	  		
-		/* gzip解压原始数据 */
-		unzipmem(httpData, strEsp8266_Fram_Record .InfBit .FramLength, aucOut); 
-		/* 解包JSON数据获取天气数据 */
-		parsingJSON((const char*)aucOut, &ctweather);
-	#else
-		/* 解包JSON数据获取天气数据 */
-		parsingJSON((const char*)httpData, &ctweather);
-	#endif
-		
-		printf("city = %s\r\n",ctweather.city);
-		printf("date = %s\r\n",ctweather.date);
-		printf("high_tem = %s\r\n",ctweather.high_tem);
-		printf("low_tem = %s\r\n",ctweather.low_tem);
-		printf("wind_scale = %s\r\n",ctweather.wind_scale);
-		Delay(8000);
-		
-		/* 将天气数据编码转为GBK */
-		dataToGBK(&ctweather,buff);
-		
-		/* 播放天气 */
-		SYN6288_Play(buff);
-		
-		Delay(10000);
-		while(1);
-		
+	{		
 		/* 断线重连 */
 		#pragma diag_suppress 111
 		if(ucTcpClosedFlag)                                             //检测是否失去连接
@@ -346,6 +349,21 @@ int main(void)
 				printf("閲嶈繛鐑偣鍜屾湇鍔″櫒鎴愬姛!!!\r\n");
 			}			
 			while(!ESP8266_UnvarnishSend());					
+		}
+		
+		/* 每过1min */
+		if (TimeDisplay == 1)
+		{
+		  static int timcnt = 0;
+			timcnt++;
+		  /* Display current time */
+		  Time_Display(RTC_GetCounter(),&systmtime); 	
+			if(timcnt == 60)
+			{
+				SYN6288_Play("过了一分钟");		
+				timcnt = 0;
+			}
+		  TimeDisplay = 0;
 		}
 	}
 }

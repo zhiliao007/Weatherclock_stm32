@@ -138,7 +138,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>JL2CM3</Key>
-          <Name>-U59204088 -O78 -S8 -ZTIFSpeedSel50000 -A0 -C0 -JU1 -JI127.0.0.1 -JP0 -RST0 -N00("ARM CoreSight SW-DP") -D00(1BA01477) -L00(0) -TO18 -TC10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -TB1 -TFE0 -FO15 -FD20000000 -FC1000 -FN1 -FF0STM32F10x_512.FLM -FS08000000 -FL080000 -FP0($$Device:STM32F103ZE$Flash\STM32F10x_512.FLM)</Name>
+          <Name>-U59204088 -O78 -S10 -ZTIFSpeedSel25000 -A0 -C0 -JU1 -JI127.0.0.1 -JP0 -RST0 -N00("ARM CoreSight SW-DP") -D00(1BA01477) -L00(0) -TO18 -TC10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -TB1 -TFE0 -FO15 -FD20000000 -FC1000 -FN1 -FF0STM32F10x_512.FLM -FS08000000 -FL080000 -FP0($$Device:STM32F103ZE$Flash\STM32F10x_512.FLM)</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -700,6 +700,42 @@
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
+    <File>
+      <GroupNumber>5</GroupNumber>
+      <FileNumber>38</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\User\bsp\rtc\bsp_calendar.c</PathWithFileName>
+      <FilenameWithoutPath>bsp_calendar.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>5</GroupNumber>
+      <FileNumber>39</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\User\bsp\rtc\bsp_date.c</PathWithFileName>
+      <FilenameWithoutPath>bsp_date.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>5</GroupNumber>
+      <FileNumber>40</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\User\bsp\rtc\bsp_rtc.c</PathWithFileName>
+      <FilenameWithoutPath>bsp_rtc.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
   </Group>
 
   <Group>
@@ -710,7 +746,7 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>6</GroupNumber>
-      <FileNumber>38</FileNumber>
+      <FileNumber>41</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -730,7 +766,7 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>7</GroupNumber>
-      <FileNumber>39</FileNumber>
+      <FileNumber>42</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -742,7 +778,7 @@
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
-      <FileNumber>40</FileNumber>
+      <FileNumber>43</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -754,7 +790,7 @@
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
-      <FileNumber>41</FileNumber>
+      <FileNumber>44</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -766,7 +802,7 @@
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
-      <FileNumber>42</FileNumber>
+      <FileNumber>45</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -778,7 +814,7 @@
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
-      <FileNumber>43</FileNumber>
+      <FileNumber>46</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -790,7 +826,7 @@
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
-      <FileNumber>44</FileNumber>
+      <FileNumber>47</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -802,7 +838,7 @@
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
-      <FileNumber>45</FileNumber>
+      <FileNumber>48</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -814,7 +850,7 @@
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
-      <FileNumber>46</FileNumber>
+      <FileNumber>49</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -834,7 +870,7 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>8</GroupNumber>
-      <FileNumber>47</FileNumber>
+      <FileNumber>50</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
