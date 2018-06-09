@@ -152,6 +152,9 @@ void parsingJSON(const char* str, CityWeather* weather)
 
 void setESP8266STAMode(char *ssid, char *pwd)
 {
+	char espPN[] = {"1234"};
+	char espTO[] = {"1000"};
+	
 	printf("\r\n正在配置 ESP8266 ......\r\n" );
 
 	if(ESP8266_AT_Test())
@@ -166,11 +169,19 @@ void setESP8266STAMode(char *ssid, char *pwd)
 	printf("\r\n< 2 >\r\n");
 	while(!ESP8266_JoinAP(ssid,pwd));		
 	printf("\r\n< 3 >\r\n");
+
+#if 0
 	ESP8266_Enable_MultipleId(DISABLE);	
 	while(!ESP8266_Link_Server(enumTCP,User_ESP8266_TcpServer_IP,User_ESP8266_TcpServer_Port,Single_ID_0));	
 	printf("\r\n< 4 >\r\n");
 	while(!ESP8266_UnvarnishSend());	
 	printf("配置 ESP8266 完毕\r\n");
+#else
+	ESP8266_Enable_MultipleId(ENABLE);	
+	while(!ESP8266_StartOrShutServer(ENABLE,espPN,espTO));	
+	printf("配置 ESP8266 完毕\r\n");
+	while(1);
+#endif
 }
 
 void setESP8266APMode(void)
