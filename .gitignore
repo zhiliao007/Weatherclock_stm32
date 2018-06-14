@@ -65,6 +65,11 @@ mykey.txt
 JLinkLog.txt
 *.dbgconf
 
+# SW4stm32
+*.metadata/
+*.bin
+*.hex
+
 # Qt-es
 *.exe
 .qmake.cache
