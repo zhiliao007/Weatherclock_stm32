@@ -9,7 +9,9 @@ LR_IROM1 0x08000000 0x00080000  {    ; load region size_region
    .ANY (+RO)
   }
   RW_IRAM1 0x20000000 0x00010000  {  ; RW data
-   .ANY (+RW +ZI)
+    *.o(STACK)       					;选择STACK节区，栈
+    stm32f10x_rcc.o(+RW)            	;选择stm32f10x_rcc的RW内容
+    .ANY (+RW +ZI)
   }
   RW_ERAM1 0x680FF000 0xFFF {  	; 外部SRAM
 	.ANY (+RW +ZI)
