@@ -92,7 +92,7 @@ void DEBUG_USART_Init(void)
   * 说    明：无
   */
 /* printf输出会导致系统堆栈溢出，该bug待定位 */
-/*#ifdef __GNUC__
+#ifdef __GNUC__
   #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
 #else
   #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
@@ -104,5 +104,5 @@ PUTCHAR_PROTOTYPE
 	while (USART_GetFlagStatus(DEBUG_USARTx, USART_FLAG_TXE) == RESET);
 
 	return ch;
-}*/
+}
 /******************* (C) COPYRIGHT 2015-2020 硬石嵌入式开发团队 *****END OF FILE****/

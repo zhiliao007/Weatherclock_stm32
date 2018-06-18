@@ -63,8 +63,8 @@ typedef enum{
 
 /*********************************************** ESP8266 º¯Êýºê¶¨Òå *******************************************/
 #define ESP8266_Usart( fmt, ... )           USART_printf (ESP8266_USARTx, fmt, ##__VA_ARGS__ ) 
-#define PC_Usart( fmt, ... )                printf ( fmt, ##__VA_ARGS__ )
-//#define PC_Usart( fmt, ... )
+//#define PC_Usart( fmt, ... )                printf ( fmt, ##__VA_ARGS__ )
+#define PC_Usart( fmt, ... )
 
 #define ESP8266_RST_HIGH_LEVEL()            GPIO_SetBits(ESP8266_RST_PORT,ESP8266_RST_PIN )
 #define ESP8266_RST_LOW_LEVEL()             GPIO_ResetBits(ESP8266_RST_PORT,ESP8266_RST_PIN )
