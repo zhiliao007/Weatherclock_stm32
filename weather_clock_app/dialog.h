@@ -24,7 +24,6 @@ class Dialog : public QDialog
 public:
     explicit Dialog(QWidget *parent = 0);
     ~Dialog();
-
 private slots:
     void on_skip_clicked();
 
@@ -34,7 +33,8 @@ private:
     Ui::Dialog *ui;
     MainWindow *w;
     QTcpSocket *tcpSocket;
-    void usleep(unsigned int msec);
+    QString getLocalHostIP();
+    void usleep(unsigned int msec); 
 };
 
 #endif // DIALOG_H

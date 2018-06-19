@@ -66,35 +66,48 @@ void Dialog::usleep(unsigned int msec)
 
 }*/
 
+QString Dialog::getLocalHostIP()
+{
+    QList<QHostAddress> list = QNetworkInterface::allAddresses();
+        foreach (QHostAddress address, list)
+        {
+           if(address.protocol() == QAbstractSocket::IPv4Protocol) //我们使用IPv4地址
+           {
+               if(address.toString().contains( "192.168."))
+               {
+                   qDebug()<<address.toString();
+
+                   return address.toString();
+               }
+           }
+        }
+           return 0;
+}
+
 void Dialog::on_ok_clicked()
 {
-
     tcpSocket->abort();//终止当前的连接
-    QList<QHostAddress> list = QNetworkInterface::allAddresses();
+    QString str = getLocalHostIP().section('.',0,2);
+    QString num;
 
-    foreach (QHostAddress address, list)
-    {
-        if(address.protocol() == QAbstractSocket::IPv4Protocol) //我们使用IPv4地址
-        {
-            qDebug()<<address.toString();
-            QString str = address.toString().section('.',0,2);
-            QString num;
-            qDebug()<<num.number(1)<<endl;
-            tcpSocket->connectToHost(str + "." +num.number(1),1234);
-            usleep(500);
-            if(tcpSocket->waitForConnected(200))
-            {
-                qDebug()<<"连接成功！"<<endl;
-                QString msg = ui->name->text() + ui->pwd->text();
-                qDebug()<<msg<<endl;
- //               tcpSocket->write(msg.toLatin1());
-                qDebug()<<"发送成功"<<endl;
-            }
-            w->show();
-            return;
-        }
-    }
+    tcpSocket->connectToHost(str + "." +num.number(1),1234);
+    qDebug()<<"连接成功！"<<endl;
+    usleep(1000);
+
+    tcpSocket->write(ui->name->text().toLatin1());
+    qDebug()<<"发送成功"<<endl;
+    usleep(1000);
+
+    tcpSocket->write( ui->pwd->text().toLatin1());
+    qDebug()<<"发送成功"<<endl;
+    usleep(1000);
+
+    w->show();
 }
+
+
+
+
 
 void Dialog::on_skip_clicked()
 {
