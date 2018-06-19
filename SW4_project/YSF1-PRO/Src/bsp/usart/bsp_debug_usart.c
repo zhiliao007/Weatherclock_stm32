@@ -91,7 +91,6 @@ void DEBUG_USART_Init(void)
   * 返 回 值: 无
   * 说    明：无
   */
-/* printf输出会导致系统堆栈溢出，该bug待定位 */
 #ifdef __GNUC__
   #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
 #else

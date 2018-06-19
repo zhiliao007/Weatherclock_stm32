@@ -313,8 +313,8 @@ bool ESP8266_Cmd ( char * cmd, char * reply1, char * reply2, u32 waittime )
 	
 	strEsp8266_Fram_Record .Data_RX_BUF [ strEsp8266_Fram_Record .InfBit .FramLength ]  = '\0';
 
-	PC_Usart ( "%s", strEsp8266_Fram_Record .Data_RX_BUF );
-//  printf("%s->%s\n",cmd,strEsp8266_Fram_Record .Data_RX_BUF);
+	/* 此处打印会导致硬件异常，待修复 */
+    //printf("%s",strEsp8266_Fram_Record .Data_RX_BUF);
 	if ( ( reply1 != 0 ) && ( reply2 != 0 ) )
 		return ( ( bool ) strstr ( strEsp8266_Fram_Record .Data_RX_BUF, reply1 ) || 
 						 ( bool ) strstr ( strEsp8266_Fram_Record .Data_RX_BUF, reply2 ) ); 

@@ -226,7 +226,7 @@ void dataToGBK(CityWeather *weather,char * buff)
 	GBK_wind[1] = (weather->wind_scale)[10];
 	GBK_wind[2] = (weather->wind_scale)[11];
 	GBK_wind[3] = '\0';
-	sprintf(buff,"6月%s，%s今天%s度，%s度，风力指数%s级",GBK_date,GBK_city,GBK_high,GBK_low,GBK_wind);
+	sprintf(buff,"6月%s，%s今天%s度，%s度，风力指数%s 级",GBK_date,GBK_city,GBK_high,GBK_low,GBK_wind);
 
 }
 
