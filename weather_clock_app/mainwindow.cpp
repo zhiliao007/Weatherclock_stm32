@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QtNetwork>
-#
+
 
 //#define GET_HOST_COMMAND "GetCYHost"
 #define GET_HOST_COMMAND "GetIPAddr"

@@ -5,6 +5,7 @@
 #include <QUdpSocket>
 #include <QTcpSocket>
 #include <QTcpServer>
+#include <QTimer>
 //#include <QLabel>
 
 namespace Ui {
