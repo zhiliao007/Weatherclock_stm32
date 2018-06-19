@@ -231,7 +231,7 @@ void dataToGBK(CityWeather *weather,char * buff)
 }
 
 
-#define FLASHFLAG 0xDDDD
+#define FLASHFLAG 0xCCCC
 uint16_t g_flashFlag = FLASHFLAG;
 
 /**

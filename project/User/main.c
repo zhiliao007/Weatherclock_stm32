@@ -228,12 +228,12 @@ void dataToGBK(CityWeather *weather,char * buff)
 	GBK_wind[1] = (weather->wind_scale)[10];
 	GBK_wind[2] = (weather->wind_scale)[11];
 	GBK_wind[3] = '\0';
-	sprintf(buff,"6月%s，%s今天%s度，%s度，风力指数%s级",GBK_date,GBK_city,GBK_high,GBK_low,GBK_wind);
+	sprintf(buff,"6月%s，%s今天%s度，%s度，风力指数%s 级",GBK_date,GBK_city,GBK_high,GBK_low,GBK_wind);
 
 }
 
 
-#define FLASHFLAG 0xCCCC
+#define FLASHFLAG 0xDDDD
 uint16_t g_flashFlag = FLASHFLAG;
 
 /**
@@ -246,6 +246,7 @@ int main(void)
 {
 	uint8_t ucStatus;  
 	char buff[300];
+	char palybuff[300];
 	uint16_t flashFlag;
 	uint8_t ssidBuff[50];
 	uint8_t pwdBuff[50];
@@ -289,17 +290,25 @@ int main(void)
 		SYN6288_Play("初次使用正在设置账号密码");
 		setESP8266APMode();
 		SYN6288_Play("配置AP模式成功,请连接到esp8266并输入账号密码");
+		
 		ESP8266_ReceiveString(ENABLE);
 		SYN6288_Play("连接成功");
+		
 		sprintf((char *)ssidBuff,"%s",ESP8266_ReceiveString(ENABLE));
-		SYN6288_Play("账号为");
-		Delay(3000);
-		SYN6288_Play((const char *)(ssidBuff+12));         //12 and 11 is offest address 
 		sprintf((char *)pwdBuff,"%s",ESP8266_ReceiveString(ENABLE));
-		SYN6288_Play("密码为");
-		Delay(3000);
-		SYN6288_Play((const char *)(pwdBuff+11));
+		
+		sprintf(palybuff,"%s %s %s %s","账号为",(const char *)(ssidBuff+12),"密码为",(const char *)(pwdBuff+11));
+		SYN6288_Play(palybuff);
+		Delay(13000);
+/*		SYN6288_Play("账号为");
+		Delay(1500);
+		SYN6288_Play((const char *)(ssidBuff+12));         //12 and 11 is offest address 
 		Delay(5000);
+		SYN6288_Play("密码为");
+		Delay(1500);
+		SYN6288_Play((const char *)(pwdBuff+11));
+		Delay(5000);*/
+		
 		/* 向内部Flash写入初始密码 */
 		STMFLASH_Write(FLASH_ssidAddress,(uint16_t *)(ssidBuff+12),(strlen((const char *)ssidBuff)-12)/2+1);
 		STMFLASH_Write(FLASH_pwdAddress,(uint16_t *)(pwdBuff+11),(strlen((const char *)pwdBuff)-11)/2+1);

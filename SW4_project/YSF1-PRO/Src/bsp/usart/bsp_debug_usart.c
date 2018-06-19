@@ -102,6 +102,6 @@ PUTCHAR_PROTOTYPE
 
 	while (USART_GetFlagStatus(DEBUG_USARTx, USART_FLAG_TXE) == RESET);
 
-	return ch;
+	return (ch);
 }
 /******************* (C) COPYRIGHT 2015-2020 硬石嵌入式开发团队 *****END OF FILE****/
