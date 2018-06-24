@@ -8,8 +8,9 @@ Dialog::Dialog(QWidget *parent) :
     tcpSocket = new QTcpSocket(this);
     w = new MainWindow;
     ui->setupUi(this);
+#if ANDROID
     this->showFullScreen();
-
+#endif
     connect(ui->ok,&QPushButton::clicked,this,&Dialog::on_ok_clicked);
     connect(ui->skip,&QPushButton::clicked,this,&Dialog::on_skip_clicked);
 }
